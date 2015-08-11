@@ -1,0 +1,21 @@
+#! /bin/bash
+
+# Runs the given command line argument, then if there
+# are filesystem changes (like when you save a file)
+# run the command again (and again)...
+#
+# Example:
+#    gowatch go test
+
+clear
+"$@" &
+PID=$!
+
+trap 'kill -9 $PID &> /dev/null;exit' SIGINT
+
+while inotifywait -e modify .;do
+	kill -9 $PID &> /dev/null
+	clear
+	"$@" &
+	PID=$!
+done
