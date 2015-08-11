@@ -9,13 +9,16 @@
 
 clear
 "$@" &
-PID=$!
 
-trap 'kill -9 $PID &> /dev/null;exit' SIGINT
+cleanup(){
+	# Kill all child process but not myself:
+	kill -9 `ps -o pid -o pgid | grep $$ | awk '{print $1}' | grep -v $$`
+}
+
+trap 'cleanup;exit' SIGINT
 
 while inotifywait -e modify .;do
-	kill -9 $PID &> /dev/null
+	cleanup
 	clear
 	"$@" &
-	PID=$!
 done
