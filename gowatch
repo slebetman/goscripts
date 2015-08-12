@@ -12,7 +12,12 @@ clear
 
 cleanup(){
 	# Kill all child process but not myself:
-	kill -9 `ps -o pid -o pgid | grep $$ | awk '{print $1}' | grep -v $$`
+	kill -9 $(
+		ps -o pid -o pgid |
+		grep $$ |
+		awk '{print $1}' |
+		grep -v $$
+	) &> /dev/null
 }
 
 trap 'cleanup;exit' SIGINT
