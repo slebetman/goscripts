@@ -22,3 +22,10 @@ Example:
 
     gowatch go test
 
+If you need to run several commands in sequence then you can quote them
+and pass them as a single argument to avoid the shell interpreting the
+`;` character.
+
+Example:
+
+    gowatch 'goimports -w .;gorun'

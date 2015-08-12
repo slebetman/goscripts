@@ -5,10 +5,24 @@
 # run the command again (and again)...
 #
 # Example:
-#    gowatch go test
+#     gowatch go test
+#
+# If you need to run several commands in sequence then
+# you need to quote them and pass them as a single
+# argument (to avoid the shell interpreting the `;`
+# character.
+#
+# Example:
+#     gowatch 'goimports -w .;gorun'
 
-clear
-"$@" &
+run(){
+	clear
+	if [ "$#" -gt 1 ];then
+		"$@" &
+	else
+		eval "$* &"
+	fi
+}
 
 cleanup(){
 	# Kill all child process but not myself:
@@ -22,8 +36,8 @@ cleanup(){
 
 trap 'cleanup;exit' SIGINT
 
+run "$@"
 while inotifywait -e modify .;do
 	cleanup
-	clear
-	"$@" &
+	run "$@"
 done
