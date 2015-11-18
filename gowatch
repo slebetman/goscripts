@@ -15,6 +15,17 @@
 # Example:
 #     gowatch 'goimports -w .;gorun'
 
+if fswatch --help &> /dev/null;then
+	NOTIFIER="fswatch -1 ."
+elif inotifywait --help &> /dev/null;then
+	NOTIFIER="inotifywait -e modify ."
+else
+	echo "Please install fswatch or inotifywait (inotify-tools)"
+	exit 1
+fi
+
+echo $NOTIFIER
+	
 run(){
 	clear
 	if [ "$#" -gt 1 ];then
@@ -37,7 +48,7 @@ cleanup(){
 trap 'cleanup;exit' SIGINT
 
 run "$@"
-while inotifywait -e modify .;do
+while $NOTIFIER;do
 	cleanup
 	run "$@"
 done
